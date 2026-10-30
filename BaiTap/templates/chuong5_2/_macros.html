@@ -1,0 +1,10 @@
+{% macro render_field(field) %}
+<div style="margin-bottom:12px">
+  {% if field.type == 'BooleanField' %}
+    {{ field() }} {{ field.label }}
+  {% else %}
+    {{ field.label }}<br>{{ field(**kwargs) }}
+  {% endif %}
+  {% for e in field.errors %}<div style="color:red;font-size:13px">{{ e }}</div>{% endfor %}
+</div>
+{% endmacro %}

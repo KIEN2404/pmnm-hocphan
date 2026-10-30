@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/maytinh" method="POST">
+        <input type="text" name="a"> <br>
+
+        <select name="pheptinh">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+        </select> <br>
+
+        <input type="text" name="b"> <br>
+        <h1>{{values["kq"]}}</h1>
+        
+        <br>
+        <input type="submit" value="Tính toán">
+    </form>
+</body>
+</html>

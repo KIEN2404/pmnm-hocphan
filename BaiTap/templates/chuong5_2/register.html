@@ -1,0 +1,20 @@
+{% from "/chuong5_2/_macros.html" import render_field %}
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Đăng ký</title></head>
+<body>
+  <h2>Đăng ký</h2>
+  {% for category, msg in get_flashed_messages(with_categories=true) %}
+    <p>{{ msg }}</p>
+  {% endfor %}
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }} 
+    {{ render_field(form.username) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.confirm) }}
+    {{ render_field(form.agree) }}
+    {{ form.submit() }}
+  </form>
+</body>
+</html>

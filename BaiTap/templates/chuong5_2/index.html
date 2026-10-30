@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><title>Trang chủ</title></head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+            <p class="alert alert-{{ category }}">{{ message }}</p>
+      {% endif %}   
+    {% endwith %}
+    <h1>Xin chào, {{ user }}!</h1>
+    <a href="{{ url_for('logout') }}">Đăng xuất</a>
+</body>
+</html>
