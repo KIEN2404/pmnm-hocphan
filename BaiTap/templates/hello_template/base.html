@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
 
 <body>
-    {% include "_navbar.html" %}
+    {% include "/hello_template/_navbar.html" %}
 
     <main>
     {% block content %}{% endblock %}
@@ -17,6 +17,6 @@
 
     <img src="{{ url_for('static', filename='img/logo.png')}}" alt="Logo"> <br>
 
-    {% include "_footer.html" %}
+    {% include "/hello_template/_footer.html" %}
 </body>
 </html>
