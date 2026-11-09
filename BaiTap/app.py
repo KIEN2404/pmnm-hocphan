@@ -6,10 +6,88 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Regexp, Email, EqualTo, ValidationError
 
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import String, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+
+
+#
+#
+#  CAU HINH KET NOI CSDL  
+class Base(DeclarativeBase):    #   (1)
+    pass
+
+db = SQLAlchemy(model_class=Base)   #   (2)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hihihaha'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///qlsv.db' #   (3)
+db.init_app(app)    #   (4)
 
+class Student(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    mssv: Mapped[str] = mapped_column(String(10), unique=True)
+    name: Mapped[str] = mapped_column(String(100))
+    gpa: Mapped[float] = mapped_column(default=0.0)
+
+    def __repr__(self):
+        return f"<Student {self.mssv} {self.name} {self.gpa})>"
+
+with app.app_context():
+    db.create_all()
+
+@app.get("/them-mau")
+def add_sample():
+    total = db.session.scalar(db.select(func.count(Student.id)))
+    if total > 0:
+        return f"Da co {total} sinh vien, khong them nua"
+    an = Student(mssv="23T1020001", name="Nguyen Van An", gpa=8.5)
+    before = an.id
+    db.session.add(an)
+    db.session.add_all([
+        Student(mssv="23T1020002", name="Tran Thi Binh", gpa=6.0),
+        Student(mssv="23T1020003", name="Le Hoang Cuong", gpa=9.5),
+        Student(mssv="23T1020004", name="Pham Minh Dung", gpa=4.0),
+        Student(mssv="23T1020005", name="Hoang Thu Ha", gpa=0.0),
+    ])
+    db.session.commit()
+    return (f"da them sinh vien, id cua an: "
+            f"truoc khi commit: {before}, sau khi commit: {an.id}")
+
+@app.get("/thu-truy-van")
+def try_queries():
+    if db.session.scalar(db.select(func.count(Student.id))) == 0:
+        return "chua co du lieu, them-mau truoc"
+    lines = []
+    lines.append(f"1. get(3): {db.session.get(Student, 3)}")
+    lines.append(f"2. get(99): {db.session.get(Student, 99)}")
+    everyone = db.session.execute(
+        db.select(Student)).scalars().all()
+    lines.append(f"3. tat ca: {len(everyone)} sinh vien")
+    stmt = (db.select(Student)
+            .where(Student.gpa >= 0)
+            .order_by(Student.gpa.desc()))
+    good = db.session.execute(stmt).scalars().all()
+    lines.append(f"4. gpa >= 8: {good}")
+    binh = db.session.scalar(db.select(Student)
+                             .filter_by(mssv="23T1020002"))
+    lines.append(f"5. MSSV 23T1020002: {binh}")
+    count = db.session.scalar(
+        db.select(func.count(Student.id)))
+    avg = db.session.scalar(db.select(func.avg(Student.gpa)))
+    lines.append(f"6. so sv: {count}, diem trung binh: {avg:.2f}")
+    return "<br>".join(lines)
+
+@app.route("/dssv")
+def hien_thi_sinh_vien():
+    return render_template("/sqlalchemy/dssv.html", students=db.session.execute(db.select(Student)).scalars().all())
+
+
+
+#
+#
+#   GIOI THIEU FLASK
 @app.route('/')
 def hello():
     return "Hello, World!"
